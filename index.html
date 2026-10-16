@@ -1,0 +1,289 @@
+<style>
+  :root{
+    --bg:#060b16; --bg2:#0a1322; --panel:rgba(13,22,38,.86); --line:rgba(140,180,220,.14);
+    --txt:#e9eef6; --mut:#93a3bb; --acc:#5eead4; --acc2:#7dd3fc; --gold:#ffd166;
+    --card:rgba(20,32,52,.6); --radius:14px;
+  }
+  html{ color-scheme:dark; }
+  body{
+    margin:0; text-align:left; background:
+      radial-gradient(1200px 700px at 80% -10%, #12325a 0%, transparent 60%),
+      radial-gradient(900px 600px at 0% 110%, #0e3a3a 0%, transparent 55%),
+      var(--bg);
+    color:var(--txt);
+    font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    min-height:100vh;
+  }
+  *{ box-sizing:border-box; }
+  #topbar{
+    position:sticky; top:0; z-index:20;
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    padding:12px 18px;
+    background:rgba(6,11,22,.82); backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand .gem{
+    width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+    background:linear-gradient(135deg,#0b3b5e,#0e6e8c 60%,#14b8a6);
+    box-shadow:0 4px 24px rgba(45,212,191,.35); overflow:hidden;
+  }
+  .brand h1{ font-family:Georgia,"Times New Roman",serif; font-size:21px; margin:0; letter-spacing:.3px; }
+  .brand h1 span{ color:var(--acc); font-style:italic; }
+  .brand small{ display:block; font-family:Inter,sans-serif; font-size:11px; color:var(--mut); letter-spacing:.14em; text-transform:uppercase; }
+  #seedRow{ display:flex; gap:8px; align-items:center; margin-left:auto; flex-wrap:wrap; }
+  #seedInput{
+    background:#0b1526; border:1px solid var(--line); color:var(--txt);
+    padding:9px 12px; border-radius:10px; width:130px; font-size:15px; outline:none;
+    font-variant-numeric:tabular-nums; font-family:ui-monospace,monospace; text-align:center;
+    letter-spacing:.12em;
+  }
+  #seedInput:focus{ border-color:var(--acc); box-shadow:0 0 0 3px rgba(94,234,212,.15); }
+  button{
+    border:1px solid var(--line); background:#132136; color:var(--txt);
+    padding:9px 14px; border-radius:10px; cursor:pointer; font-size:13.5px; font-weight:600;
+    transition:transform .08s, background .15s, border-color .15s;
+  }
+  button:hover{ background:#1a2c47; border-color:rgba(94,234,212,.4); }
+  button:active{ transform:translateY(1px); }
+  button:disabled{ opacity:.55; cursor:wait; }
+  #newBtn{ background:linear-gradient(135deg,#0ea5e9,#14b8a6); border:none; color:#04202a; }
+  #newBtn:hover{ filter:brightness(1.08); }
+  #layout{
+    display:grid; grid-template-columns:340px minmax(0,1fr); gap:16px;
+    padding:16px; max-width:1460px; margin:0 auto; align-items:start;
+  }
+  @media (max-width:980px){ #layout{ grid-template-columns:1fr; } }
+  #panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    backdrop-filter:blur(16px); overflow:hidden;
+    position:sticky; top:70px; max-height:calc(100vh - 90px); overflow-y:auto;
+  }
+  @media (max-width:980px){ #panel{ position:static; max-height:none; } }
+  .sec{ padding:14px 16px; border-bottom:1px solid var(--line); }
+  .sec h2{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--acc); margin:0 0 10px; }
+  .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:9px 0; }
+  .row label{ font-size:13px; color:#c9d4e6; }
+  .row output{ font-size:12px; color:var(--mut); font-variant-numeric:tabular-nums; min-width:64px; text-align:right; }
+  input[type=range]{ width:100%; accent-color:#2dd4bf; margin:2px 0 0; }
+  .ctl{ margin:8px 0; }
+  .ctl label{ display:flex; justify-content:space-between; font-size:13px; margin-bottom:2px; }
+  .ctl label output{ color:var(--mut); font-size:12px; }
+  select{
+    width:100%; background:#0b1526; color:var(--txt); border:1px solid var(--line);
+    border-radius:10px; padding:9px 10px; font-size:13.5px;
+  }
+  .presets{ display:flex; flex-wrap:wrap; gap:7px; }
+  .presets button{ font-size:12px; padding:7px 10px; border-radius:999px; }
+  .check{ display:flex; align-items:center; gap:9px; font-size:13.5px; padding:5px 0; cursor:pointer; }
+  .check input{ width:17px; height:17px; accent-color:#2dd4bf; }
+  #regenBtn{ width:100%; padding:12px; font-size:14px; background:linear-gradient(135deg,#22d3ee,#34d399); color:#03252b; border:none; }
+  #surpriseBtn{ width:100%; padding:10px; font-size:13px; margin-top:8px; }
+  .hint{ font-size:12px; color:var(--mut); line-height:1.5; margin:8px 0 0; }
+  /* stats */
+  #statName{ font-family:Georgia,serif; font-size:22px; margin:0; }
+  #statSeed{ color:var(--mut); font-size:12px; font-family:ui-monospace,monospace; }
+  .statgrid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+  .stat{ background:var(--card); border:1px solid var(--line); border-radius:10px; padding:9px 10px; }
+  .stat b{ display:block; font-size:13px; }
+  .stat span{ font-size:11px; color:var(--mut); letter-spacing:.08em; text-transform:uppercase; }
+  #biomeBars{ display:flex; flex-direction:column; gap:6px; margin-top:4px; }
+  .brow{ display:grid; grid-template-columns:12px 1fr auto; gap:8px; align-items:center; font-size:12px; }
+  .brow .bdot{ width:10px; height:10px; border-radius:3px; display:block; }
+  .brow .bname{ color:#c9d4e6; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .brow .btrack{ display:none; }
+  .brow .bpct{ color:var(--mut); font-variant-numeric:tabular-nums; }
+  /* map side */
+  #stage{ display:flex; flex-direction:column; gap:12px; min-width:0; }
+  #tabs{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .tab{
+    border:1px solid var(--line); background:rgba(13,22,38,.8); color:var(--mut);
+    padding:8px 14px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer;
+  }
+  .tab.active{ background:linear-gradient(135deg,#0ea5e9,#2dd4bf); color:#04202a; border:none; }
+  #actions{ display:flex; gap:8px; margin-left:auto; flex-wrap:wrap; }
+  #mapCard{
+    position:relative; background:linear-gradient(180deg,#0a1628,#060c18);
+    border:1px solid var(--line); border-radius:18px; padding:14px;
+    box-shadow:0 20px 80px rgba(0,0,0,.5);
+  }
+  #mapWrap{ display:grid; place-items:center; min-height:300px; }
+  #mapCanvas{ border-radius:14px; box-shadow:0 10px 50px rgba(0,0,0,.55), 0 0 0 1px rgba(140,180,220,.12); max-width:100%; }
+  #offCanvas{ display:none; }
+  #progressWrap{
+    position:absolute; inset:14px; display:grid; place-items:center;
+    background:rgba(4,8,18,.72); backdrop-filter:blur(6px); border-radius:14px; z-index:5;
+  }
+  #progressWrap[hidden]{ display:none; }
+  .pbox{ width:min(360px,80%); text-align:center; }
+  .ring{
+    width:34px; height:34px; margin:0 auto; border-radius:50%;
+    border:3px solid rgba(94,234,212,.2); border-top-color:#5eead4;
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  #progressMsg{ font-size:13px; color:#cfe3f5; margin:10px 0; min-height:20px; }
+  .ptrack{ height:8px; background:#132136; border-radius:99px; overflow:hidden; border:1px solid var(--line); }
+  #progressBar{ height:100%; width:0%; background:linear-gradient(90deg,#22d3ee,#34d399); transition:width .2s; }
+  #legend{
+    display:flex; flex-wrap:wrap; gap:6px 14px; font-size:12px; color:var(--mut);
+    padding:10px 4px 0; align-items:center;
+  }
+  #legend b{ color:var(--txt); }
+  #legend span{ display:inline-flex; align-items:center; gap:6px; }
+  #legend i{ width:12px; height:12px; border-radius:4px; display:inline-block; border:1px solid rgba(255,255,255,.25); }
+  #genNote{ font-size:12px; color:var(--mut); padding:0 4px; font-family:ui-monospace,monospace; }
+  #about{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:14px 16px; font-size:13px; color:#b9c6da; line-height:1.65;
+  }
+  #about b{ color:var(--txt); }
+  #about code{ background:#0b1526; padding:1px 6px; border-radius:6px; font-size:12px; color:var(--acc); }
+</style>
+
+<div id="topbar">
+  <div class="brand">
+    <div class="gem" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" fill="#0a2540"/>
+        <path d="M2.5 15.5c2.5-1.4 5-1.4 7.5 0s5 1.4 7.5 0 4-1.2 5.5-.4" stroke="#7dd3fc" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M4 19.5c2-1 4-1 6 0s4 1 6 0 3.5-1 4.5-.3" stroke="#2dd4bf" stroke-width="1.2" stroke-linecap="round" opacity=".7"/>
+        <path d="M7 13.5L12 5l5 8.5z" fill="#3f6212"/>
+        <path d="M12 5l5 8.5H9.5z" fill="#4d7c0f"/>
+        <path d="M12 5l2.2 8.5h-4.4z" fill="#65a30d"/>
+        <path d="M12 5l1 3.2L9.8 9z" fill="#e2e8f0"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Isle<span>forge</span></h1>
+      <small>realistic island simulator</small>
+    </div>
+  </div>
+  <div id="seedRow">
+    <input id="seedInput" value="412007" inputmode="numeric" pattern="[0-9]*" maxlength="6" spellcheck="false" placeholder="seed" title="Numeric seed (0–999999)" />
+    <button id="diceBtn" title="Random numeric seed">Random</button>
+    <button id="newBtn">New island</button>
+  </div>
+</div>
+
+<div id="layout">
+  <aside id="panel">
+    <div class="sec">
+      <h2>Landmass</h2>
+      <div class="row"><label>Island type</label></div>
+      <select id="typeSel">
+        <option value="continental" selected>Continental — mixed relief</option>
+        <option value="volcanic">Volcanic — cone + crater</option>
+        <option value="atoll">Atoll — coral ring + lagoon</option>
+        <option value="archipelago">Archipelago — island chain</option>
+        <option value="seamount">Seamount — drowned bank</option>
+      </select>
+      <div class="presets" style="margin-top:10px">
+        <button data-preset="continental">Continental</button>
+        <button data-preset="volcanic">Volcanic</button>
+        <button data-preset="atoll">Atoll</button>
+        <button data-preset="archipelago">Archipelago</button>
+        <button data-preset="desert">Desert</button>
+        <button data-preset="fjord">Fjord</button>
+      </div>
+      <div class="ctl"><label>Island size <output id="islandSizeV"></output></label><input id="islandSize" type="range" min="0.3" max="0.7" step="0.01" value="0.52"></div>
+      <div class="ctl"><label>Sea level <output id="seaLevelV"></output></label><input id="seaLevel" type="range" min="0.3" max="0.55" step="0.005" value="0.42"></div>
+      <div class="ctl"><label>Coast complexity <output id="complexityV"></output></label><input id="complexity" type="range" min="0" max="1" step="0.01" value="0.62"></div>
+      <div class="ctl"><label>Mountains / relief <output id="mountainsV"></output></label><input id="mountains" type="range" min="0" max="1" step="0.01" value="0.62"></div>
+      <div class="ctl"><label>Erosion <output id="erosionV"></output></label><input id="erosion" type="range" min="0" max="1" step="0.01" value="0.55"></div>
+      <div class="ctl"><label>Terrain warp <output id="warpV"></output></label><input id="warp" type="range" min="0" max="1" step="0.01" value="0.55"></div>
+      <div class="ctl"><label>Satellite islets <output id="archipelagoV"></output></label><input id="archipelago" type="range" min="0" max="1" step="0.01" value="0.25"></div>
+      <div class="row"><label>Detail grid</label></div>
+      <select id="sizeSel">
+        <option value="256">Fast — 256</option>
+        <option value="384" selected>Detailed — 384</option>
+        <option value="512">Ultra — 512 (slow)</option>
+      </select>
+      <div class="ctl"><label>Map width <output id="worldKmV"></output></label><input id="worldKm" type="range" min="4" max="120" step="1" value="26"></div>
+      <p class="hint">Sea level, size and relief reshape the coastline — watch beaches, reefs and river mouths respond.</p>
+    </div>
+
+    <div class="sec">
+      <h2>Climate</h2>
+      <div class="ctl"><label>Rainfall <output id="rainfallV"></output></label><input id="rainfall" type="range" min="0" max="1" step="0.01" value="0.55"></div>
+      <div class="ctl"><label>Temperature <output id="temperatureV"></output></label><input id="temperature" type="range" min="0" max="1" step="0.01" value="0.62"></div>
+      <div class="ctl"><label>Prevailing wind <output id="windDegV"></output></label><input id="windDeg" type="range" min="0" max="360" step="1" value="45"></div>
+      <p class="hint">Windward slopes catch orographic rain — leeward sides turn to savanna and desert. Cold peaks grow snowfields.</p>
+    </div>
+
+    <div class="sec">
+      <h2>Rendering</h2>
+      <div class="ctl"><label>Sun angle <output id="sunAzV"></output></label><input id="sunAz" type="range" min="0" max="360" step="1" value="315"></div>
+      <div class="ctl"><label>Hillshade <output id="hillStrengthV"></output></label><input id="hillStrength" type="range" min="0" max="1" step="0.01" value="0.85"></div>
+      <label class="check"><input id="showRivers" type="checkbox" checked> Rivers and lakes</label>
+      <label class="check"><input id="showLabels" type="checkbox" checked> Labels (towns, rivers, peak)</label>
+      <label class="check"><input id="showRoads" type="checkbox" checked> Roads between towns</label>
+      <label class="check"><input id="showContours" type="checkbox"> Contour lines</label>
+      <label class="check"><input id="showGrid" type="checkbox"> Graticule</label>
+      <label class="check"><input id="showReef" type="checkbox" checked> Coral reefs</label>
+    </div>
+
+    <div class="sec">
+      <button id="regenBtn">Regenerate terrain</button>
+      <button id="surpriseBtn">Surprise me (randomize all)</button>
+      <p class="hint">Terrain sliders resimulate erosion + hydrology. Sun, layers and map style repaint instantly.</p>
+    </div>
+
+    <div class="sec">
+      <h2>Survey</h2>
+      <p id="statName">—</p>
+      <div id="statSeed">—</div>
+      <div class="statgrid">
+        <div class="stat"><span>Land area</span><b id="statArea">—</b></div>
+        <div class="stat"><span>Highest peak</span><b id="statPeak">—</b></div>
+        <div class="stat"><span>Hydrology</span><b id="statRivers">—</b></div>
+        <div class="stat"><span>Climate</span><b id="statClimate">—</b></div>
+        <div class="stat"><span>Coastline</span><b id="statCoast">—</b></div>
+        <div class="stat"><span>Lakes</span><b id="statLakes">—</b></div>
+      </div>
+      <div class="stat" style="margin-top:8px"><span>Habitability</span><b id="statHabit">—</b></div>
+      <h2 style="margin-top:14px">Biomes</h2>
+      <div id="biomeBars"></div>
+    </div>
+  </aside>
+
+  <main id="stage">
+    <div id="tabs">
+      <button class="tab active" data-style="satellite">Satellite</button>
+      <button class="tab" data-style="topo">Topographic</button>
+      <button class="tab" data-style="biome">Biomes</button>
+      <button class="tab" data-style="climate">Climate</button>
+      <button class="tab" data-style="height">Heightmap</button>
+      <div id="actions">
+        <button id="dlBtn">PNG</button>
+        <button id="linkBtn">Copy link</button>
+      </div>
+    </div>
+    <div id="mapCard">
+      <div id="mapWrap">
+        <canvas id="mapCanvas" width="800" height="800"></canvas>
+        <canvas id="offCanvas" width="384" height="384"></canvas>
+      </div>
+      <div id="progressWrap" hidden>
+        <div class="pbox">
+          <div class="ring"></div>
+          <div id="progressMsg">Shaping landmass…</div>
+          <div class="ptrack"><div id="progressBar"></div></div>
+        </div>
+      </div>
+      <div id="legend"></div>
+      <div id="genNote"></div>
+    </div>
+    <div id="about">
+      <b>How it works.</b> Domain-warped fractal noise builds the continent, then tens of thousands of hydraulic droplets carve valleys.
+      Thermal talus settles cliffs, priority-flood fill routes watersheds, and D8 flow accumulation grows rivers and lakes.
+      A wind + lapse-rate climate model paints orographic rainfall, then a Whittaker biome classifier assigns rainforest to desert
+      to tundra to ice. Settlements seek flat, fertile, watered lowlands and link up by road. Every numeric seed + slider combo is
+      shareable via <code>#link</code>.
+    </div>
+  </main>
+</div>
+
+<script type="module" src="src/app.js"></script>
+
+

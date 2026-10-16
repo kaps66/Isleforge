@@ -1,0 +1,53 @@
+// Island name fragments + config that the page JS can use via root.*
+// Keep pjs light: most logic lives in src/*.js for speed and maintainability.
+
+$meta
+  title = Isleforge — Realistic 2D Island Generator
+  description = Procedural realistic islands with hydraulic erosion, climate simulation, rivers, biomes, settlements and satellite / topographic rendering.
+  tags = island, procedural, map, generator, terrain, erosion, biome, cartography
+
+islandNameA
+  Ka
+  Mo
+  Ta
+  Na
+  Sa
+  Va
+  Lo
+  Re
+  Sha
+  Tho
+  Ae
+  Il
+
+islandNameB
+  ran
+  loa
+  nara
+  thu
+  mir
+  dos
+  lan
+  ther
+  kai
+  vos
+  mara
+
+islandNameC
+  Isle
+  Atoll
+  Cay
+  Holm
+  Reef
+  Shoal
+  Land
+  Rock
+  Bay
+
+// e.g. [islandName] => "Karanara Isle"
+islandName
+  [islandNameA][islandNameB] [islandNameC]
+  [islandNameA][islandNameB][islandNameB] {Isle|Atoll|Cay}
+  {Ile|Isle} of [islandNameA][islandNameB]
+
+
